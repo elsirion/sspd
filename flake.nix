@@ -48,8 +48,8 @@
         devShells.default = pkgs.mkShell {
           inherit nativeBuildInputs buildInputs;
         };
-
-        nixosModule.default = { config, lib, pkgs, ... }:
+      } // {
+        nixosModules.sspd = { config, lib, pkgs, ... }:
         let
           cfg = config.services.sspd;
         in
