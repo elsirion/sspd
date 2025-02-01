@@ -1,0 +1,52 @@
+name: 'SSPD Preview Deployment'
+description: 'Upload static site previews to an SSPD server'
+branding:
+  icon: 'globe'
+  color: 'blue'
+
+inputs:
+  path:
+    required: true
+    description: 'Path to the directory containing the static site files'
+  preview_token:
+    required: true
+    description: 'API token for the preview server'
+  preview_url:
+    required: true
+    description: 'Base URL of the preview server (e.g., preview.example.com)'
+
+outputs:
+  preview_url:
+    description: 'URL of the deployed preview'
+    value: ${{ steps.upload.outputs.PREVIEW_URL }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create tar archive
+      shell: bash
+      working-directory: ${{ inputs.path }}
+      run: tar -czf ../site.tar.gz .
+
+    - name: Upload to preview server
+      id: upload
+      shell: bash
+      run: |
+        RESPONSE=$(curl -X POST "https://${{ inputs.preview_url }}/upload" \
+          -H "Authorization: Bearer ${{ inputs.preview_token }}" \
+          -F "file=@site.tar.gz" \
+          -s)
+        echo "PREVIEW_URL=$(echo $RESPONSE | jq -r .preview_url)" >> $GITHUB_OUTPUT
+
+    - name: Comment PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const previewUrl = '${{ steps.upload.outputs.PREVIEW_URL }}';
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `🚀 Preview deployment is ready! [View Preview](${previewUrl})`
+          }); 

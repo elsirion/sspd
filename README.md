@@ -69,6 +69,40 @@ Required DNS records (point these to your server's IP):
 - `A` record for `*.preview.example.com`
 - `NS` record for `_acme-challenge.preview.example.com` (points to your server for automated certificate management)
 
+### GitHub Actions Integration
+
+You can use the SSPD GitHub Action to automatically upload preview deployments. Create a workflow file in your repository (e.g., `.github/workflows/preview.yml`):
+
+```yaml
+name: Deploy Preview
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      # Build your site here...
+      
+      - uses: your-username/sspd@v1
+        with:
+          path: 'dist'  # Path to your built static site
+          preview_token: ${{ secrets.PREVIEW_TOKEN }}
+          preview_url: "your.preview.server.com"
+```
+
+Required secrets:
+- `PREVIEW_TOKEN`: The API token for authentication
+
+The action will:
+1. Create a `.tar.gz` archive of your static site
+2. Upload it to your SSPD server
+3. Comment on the PR with the preview URL (if running on a pull request)
+
 ## Development Notes
 
 This project was created to experiment with AI coding tools and serves as a demonstration of:
