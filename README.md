@@ -89,10 +89,17 @@ jobs:
       # Build your site here...
       
       - uses: elsirion/sspd@v1
+        id: upload
         with:
           path: 'dist'  # Path to your built static site
           preview_token: ${{ secrets.PREVIEW_TOKEN }}
           preview_url: "your.preview.server.com"
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            🚀 Preview deployment is ready! [View Preview](${{ steps.upload.outputs.preview_url }})
+
 ```
 
 Required secrets:
