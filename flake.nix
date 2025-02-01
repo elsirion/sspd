@@ -103,16 +103,15 @@
                 ExecStart = "${cfg.package}/bin/sspd";
                 DynamicUser = true;
                 StateDirectory = "sspd";
-                LoadCredential = [ "api-token:${cfg.apiTokenFile}" ];
                 ExecStartPre = [
                   "+${pkgs.writeShellScript "load-api-token" ''
-                    export PV_API_TOKEN=$(cat "$CREDENTIALS_DIRECTORY/api-token")
+                    export PV_API_TOKEN="$(cat ${cfg.apiTokenFile})"
                   ''}"
                 ];
                 Environment = [
                   "PV_DATA_DIR=${cfg.dataDir}"
                   "PV_BASE_DOMAIN=${cfg.baseDomain}"
-                  "PV_USE_HTTPS=${toString cfg.useHttps}"
+                  "PV_USE_HTTPS=${if cfg.useHttps then "true" else "false"}"
                 ];
               };
             };
@@ -126,10 +125,9 @@
               
               virtualHosts.${cfg.baseDomain} = {
                 forceSSL = cfg.useHttps;
-                enableACME = cfg.useHttps;
+                useACMEHost = cfg.baseDomain;  # Reference the cert we defined above
                 locations."/" = {
                   proxyPass = "http://127.0.0.1:3000";
-                  proxyPassRewrite = false;
                   extraConfig = ''
                     proxy_set_header Host $host;
                     proxy_set_header X-Real-IP $remote_addr;
@@ -142,10 +140,9 @@
               # Handle all subdomains
               virtualHosts."~^(?<subdomain>.+)\.${lib.escapeRegex cfg.baseDomain}$" = {
                 forceSSL = cfg.useHttps;
-                enableACME = cfg.useHttps;
+                useACMEHost = cfg.baseDomain;  # Use the same cert
                 locations."/" = {
                   proxyPass = "http://127.0.0.1:3000";
-                  proxyPassRewrite = false;
                   extraConfig = ''
                     proxy_set_header Host $host;
                     proxy_set_header X-Real-IP $remote_addr;
