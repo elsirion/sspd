@@ -39,16 +39,4 @@ runs:
           -F "file=@/tmp/sspd/site.tar.gz" \
           -s)
         echo "PREVIEW_URL=$(echo $RESPONSE | jq -r .preview_url)" >> $GITHUB_OUTPUT
-
-    - name: Comment PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const previewUrl = '${{ steps.upload.outputs.PREVIEW_URL }}';
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `🚀 Preview deployment is ready! [View Preview](${previewUrl})`
-          }); 
+        
