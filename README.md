@@ -58,6 +58,17 @@ The response will include the preview URL:
 }
 ```
 
+The NixOS module automatically configures:
+- The `sspd` service
+- NGINX with SSL support
+- A local BIND DNS server for ACME DNS challenges
+- Automatic wildcard certificate acquisition from Let's Encrypt
+
+Required DNS records (point these to your server's IP):
+- `A` record for `preview.example.com`
+- `A` record for `*.preview.example.com`
+- `NS` record for `_acme-challenge.preview.example.com` (points to your server for automated certificate management)
+
 ## Development Notes
 
 This project was created to experiment with AI coding tools and serves as a demonstration of:
