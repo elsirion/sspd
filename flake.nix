@@ -123,10 +123,10 @@
 
             services.nginx = lib.mkIf cfg.useNginx {
               enable = true;
-              forceSSL = cfg.useHttps;
-              enableACME = cfg.useHttps;
               
               virtualHosts.${cfg.baseDomain} = {
+                forceSSL = cfg.useHttps;
+                enableACME = cfg.useHttps;
                 locations."/" = {
                   proxyPass = "http://127.0.0.1:3000";
                   proxyPassRewrite = false;
@@ -141,6 +141,8 @@
 
               # Handle all subdomains
               virtualHosts."~^(?<subdomain>.+)\.${lib.escapeRegex cfg.baseDomain}$" = {
+                forceSSL = cfg.useHttps;
+                enableACME = cfg.useHttps;
                 locations."/" = {
                   proxyPass = "http://127.0.0.1:3000";
                   proxyPassRewrite = false;
