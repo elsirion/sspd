@@ -1,3 +1,4 @@
+use axum::extract::DefaultBodyLimit;
 use axum::{
     body::Body,
     extract::{Host, Multipart, State},
@@ -16,7 +17,6 @@ use std::{fs, path::PathBuf};
 use tar::Archive;
 use tower_http::services::ServeDir;
 use tracing::{info, warn};
-use tracing_subscriber;
 
 #[derive(Debug, Clone, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -58,6 +58,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/upload", post(upload_handler))
+        .layer(DefaultBodyLimit::max(1024 * 1024 * 50))
         .fallback(handle_subdomain)
         .with_state(config.clone());
 
