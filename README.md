@@ -88,7 +88,7 @@ jobs:
       
       # Build your site here...
       
-      - uses: your-username/sspd@v1
+      - uses: elsirion/sspd@v1
         with:
           path: 'dist'  # Path to your built static site
           preview_token: ${{ secrets.PREVIEW_TOKEN }}
