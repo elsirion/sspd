@@ -34,9 +34,9 @@ runs:
       id: upload
       shell: bash
       run: |
-        RESPONSE=$(curl -X POST "https://${{ inputs.preview_url }}/upload" \
+        RESPONSE=$(curl -v -X POST "https://${{ inputs.preview_url }}/upload" \
           -H "Authorization: Bearer ${{ inputs.preview_token }}" \
           -F "file=@/tmp/sspd/site.tar.gz" \
           -s)
+        echo response: "$RESPONSE"
         echo "PREVIEW_URL=$(echo $RESPONSE | jq -r .preview_url)" >> $GITHUB_OUTPUT
-        
