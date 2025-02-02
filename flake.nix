@@ -129,6 +129,7 @@
                 forceSSL = true;
                 useACMEHost = cfg.baseDomain;  # Reference the cert we define below
                 locations."/" = {
+                  client_max_body_size 100M;
                   proxyPass = "http://127.0.0.1:3000";
                   extraConfig = ''
                     proxy_set_header Host $host;
