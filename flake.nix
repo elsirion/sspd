@@ -124,12 +124,13 @@
 
             services.nginx = {
               enable = true;
+              clientMaxBodySize = "100M";
               
               virtualHosts.${cfg.baseDomain} = {
                 forceSSL = true;
                 useACMEHost = cfg.baseDomain;  # Reference the cert we define below
+
                 locations."/" = {
-                  client_max_body_size 100M;
                   proxyPass = "http://127.0.0.1:3000";
                   extraConfig = ''
                     proxy_set_header Host $host;
